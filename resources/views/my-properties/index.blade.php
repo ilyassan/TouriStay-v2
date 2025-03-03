@@ -178,110 +178,50 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Status
                             </th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Action
-                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
-                                        <span class="text-gray-700 font-medium">JD</span>
+                        @foreach ($reservations as $reservation)
+                        @php
+                            $tourist = $reservation->tourist;
+                            // how to get the property because its not in the reservation, it not exists dont try to access it
+                            $property = $reservation->property;
+                        @endphp
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                            <span class="text-gray-700 font-medium">{{ strtoupper(substr($tourist->getFullName(), 0, 2)) }}</span>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">{{ $tourist->getFullName() }}</div>
+                                            <div class="text-sm text-gray-500">Morocco</div>
+                                        </div>
                                     </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">John Doe</div>
-                                        <div class="text-sm text-gray-500">United Kingdom</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ $property->getTitle() }}</div>
+                                    <div class="text-sm text-gray-500">{{ $property->city->getName() }}, Morocco</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">
+                                        {{ \Carbon\Carbon::parse($reservation->getFromDate())->format('M j') }} - 
+                                        {{ \Carbon\Carbon::parse($reservation->getToDate())->format('M j, Y') }}
                                     </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">Luxury Apartment with Pool</div>
-                                <div class="text-sm text-gray-500">Marrakech, Morocco</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">Jun 12 - Jun 19, 2030</div>
-                                <div class="text-sm text-gray-500">7 nights</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                $1,050
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                    Pending
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="#" class="text-green-600 hover:text-green-900 mr-3">Accept</a>
-                                <a href="#" class="text-red-600 hover:text-red-900">Decline</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
-                                        <span class="text-gray-700 font-medium">MS</span>
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">Maria Silva</div>
-                                        <div class="text-sm text-gray-500">Brazil</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">Beachfront Villa</div>
-                                <div class="text-sm text-gray-500">Barcelona, Spain</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">Jul 02 - Jul 09, 2030</div>
-                                <div class="text-sm text-gray-500">7 nights</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                $1,960
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                    Confirmed
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="#" class="text-indigo-600 hover:text-indigo-900">View Details</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
-                                        <span class="text-gray-700 font-medium">AK</span>
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">Ahmed Khalid</div>
-                                        <div class="text-sm text-gray-500">Egypt</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">Modern City Apartment</div>
-                                <div class="text-sm text-gray-500">Lisbon, Portugal</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">Jun 25 - Jun 29, 2030</div>
-                                <div class="text-sm text-gray-500">4 nights</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                $480
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                    Pending
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="#" class="text-green-600 hover:text-green-900 mr-3">Accept</a>
-                                <a href="#" class="text-red-600 hover:text-red-900">Decline</a>
-                            </td>
-                        </tr>
+                                    <div class="text-sm text-gray-500">
+                                        {{ \Carbon\Carbon::parse($reservation->getFromDate())->diffInDays(\Carbon\Carbon::parse($reservation->getToDate())) }}
+                                        nights</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ $reservation->getTotalPrice() }} DH
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-200 text-green-600">
+                                        Completed
+                                    </span>
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>

@@ -16,10 +16,31 @@ class Reservation extends Model
         'total_price',
     ];
 
+    
+    public function getPrimaryKey()
+    {
+        return $this->id;
+    }
+
+    public function getTotalPrice()
+    {
+        return $this->total_price;
+    }
+
+    public function getFromDate()
+    {
+        return $this->from_date;
+    }
+
+    public function getToDate()
+    {
+        return $this->to_date;
+    }
+
 
     public function tourist(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
     
     public function property(): BelongsTo

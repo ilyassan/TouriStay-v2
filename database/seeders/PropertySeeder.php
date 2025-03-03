@@ -13,15 +13,20 @@ class PropertySeeder extends Seeder
 {
     public function run(): void
     {
-        $users = User::pluck('id')->toArray();
+        $users = User::proprietors()->pluck('id')->toArray();
         $cities = City::pluck('id')->toArray();
         $types = Type::pluck('id')->toArray();
 
-        Property::factory(50)->make()->each(function ($property) use ($users, $cities, $types) {
-            $property->user_id = $users[array_rand($users)];
-            $property->city_id = $cities[array_rand($cities)];
-            $property->type_id = $types[array_rand($types)];
-            $property->save();
-        });
+        Property::factory(50)->create([
+            'user_id' => function () use ($users) {
+                return $users[array_rand($users)];
+            },
+            'city_id' => function () use ($cities) {
+                return $cities[array_rand($cities)];
+            },
+            'type_id' => function () use ($types) {
+                return $types[array_rand($types)];
+            },
+        ]);
     }
 }
