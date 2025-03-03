@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function () {
     // Admin-specific Routes
     Route::middleware("admin")->group(function () {
         Route::get('/dashboard', DashboardController::class)->name("dashboard");
+        Route::get('/reservations', [ReservationController::class, 'index'])->name("reservations.index");
         Route::get('/admin/properties', [PropertyController::class, 'index'])->name("properties.admin");
     });
 });
