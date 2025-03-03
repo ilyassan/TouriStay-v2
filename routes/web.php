@@ -9,10 +9,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', HomeController::class)->name("home")->middleware(["tourist", 'proprietor']);
+Route::get('/', HomeController::class)->name("home")->middleware("proprietor_or_tourist");
 
-// Public Routes
-Route::get('/properties', [PropertyController::class, 'index'])->name("properties.index")->middleware(["tourist", 'proprietor']);
+Route::get('/properties', [PropertyController::class, 'index'])->name("properties.index")->middleware("proprietor_or_tourist");
+Route::get('/properties/{property}', [PropertyController::class, 'show'])->name("properties.show")->middleware("proprietor_or_tourist");
 
 // Authenticated Users
 Route::middleware('auth')->group(function () {
@@ -28,6 +28,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware("tourist")->prefix('favorites')->group(function () {
         Route::get('/', [FavoriteController::class, 'index'])->name("favorites.index");
         Route::post('/store', [FavoriteController::class, 'store'])->name("favorites.store");
+    });
+
+    Route::middleware("tourist")->prefix('reservations')->group(function () {
+        Route::post('/store', function(){})->name("reservations.store");
     });
 
     // Property Management (General)
