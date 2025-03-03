@@ -261,7 +261,7 @@
             </script>
         @endif
 
-        <!-- Notification Toggle Script -->
+        @if (Auth::check() && Auth::user()->isProprietor())
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const toggleButton = document.getElementById('notification-toggle');
@@ -281,5 +281,6 @@
                 });
             });
         </script>
+        @endif
     </body>
 </html>

@@ -23,12 +23,6 @@
                         <!-- Title and Rating -->
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                             <h1 class="text-2xl font-bold text-gray-900">{{ $property->getTitle() }}</h1>
-                            <div class="flex items-center bg-yellow-50 px-3 py-1 rounded-full">
-                                <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                </svg>
-                                <span class="ml-1 font-medium text-gray-700">4.9 ({{ $property->reviewsCount }})</span>
-                            </div>
                         </div>
 
                         <!-- Property Basic Info -->
@@ -37,21 +31,21 @@
                                 <svg class="w-4 h-4 mr-1 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
                                 </svg>
-                                <span>{{ $property->bedrooms }} Beds</span>
+                                <span>{{ $property->getBedrooms() }} Beds</span>
                             </div>
 
                             <div class="flex items-center bg-gray-100 px-3 py-1 rounded-full">
                                 <svg class="w-4 h-4 mr-1 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M2 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V4zM8 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1H9a1 1 0 01-1-1V4zM15 3a1 1 0 00-1 1v12a1 1 0 001 1h2a1 1 0 001-1V4a1 1 0 00-1-1h-2z"></path>
                                 </svg>
-                                <span>{{ $property->bathrooms }} Baths</span>
+                                <span>{{ $property->getBathrooms() }} Baths</span>
                             </div>
 
                             <div class="flex items-center bg-gray-100 px-3 py-1 rounded-full">
                                 <svg class="w-4 h-4 mr-1 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
                                 </svg>
-                                <span>{{ $property->city->getName() }}, {{ $property->country }}</span>
+                                <span>{{ $property->city->getName() }}, {{ "Morocco" }}</span>
                             </div>
                         </div>
 
@@ -248,13 +242,12 @@
             object-fit: cover;
         }
     </style>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const pricePerNight = {{ $property->getPrice() }};
             const availableFrom = new Date("{{ $property->available_from }}");
             const availableTo = new Date("{{ $property->available_to }}");
-            const notAvailableRanges = {!! json_encode($notAvailableRanges ?? []) !!};
+            const notAvailableRanges = {!! json_encode($notAvailableRanges) !!};
 
             let checkInDate, checkOutDate;
             const priceBreakdownDiv = document.getElementById('priceBreakdown');
@@ -263,36 +256,104 @@
             const dateErrorDiv = document.getElementById('dateError');
             const reserveButton = document.getElementById('reserveButton');
 
-            // Check if a date is within an unavailable range
-            function isDateNotAvailable(dateStr) {
-                if (!dateStr) return false;
-                for (const range of notAvailableRanges) {
-                    if (dateStr >= range[0] && dateStr <= range[1]) {
-                        return true;
-                    }
-                }
-                return false;
+            // Normalize date strings to YYYY-MM-DD and handle potential invalid dates
+            const normalizedRanges = notAvailableRanges.map(range => {
+                const start = new Date(range[0]);
+                const end = new Date(range[1]);
+                return [
+                    isNaN(start) ? null : start.toISOString().split('T')[0],
+                    isNaN(end) ? null : end.toISOString().split('T')[0]
+                ].filter(Boolean);
+            }).filter(range => range.length === 2);
+
+            // Check if a date falls within an unavailable range
+            function isDateNotAvailable(date) {
+                const dateStr = date.toISOString().split('T')[0];
+                return normalizedRanges.some(range => 
+                    dateStr >= range[0] && dateStr <= range[1]
+                );
             }
 
-            // Check if the selected range overlaps with any unavailable range
+            // Check for overlap with unavailable ranges
             function hasOverlap(checkIn, checkOut) {
-                for (const range of notAvailableRanges) {
-                    const start = new Date(range[0]);
-                    const end = new Date(range[1]);
-                    if (checkIn < end && checkOut > start) {
-                        return true; // Overlap detected
-                    }
-                }
-                return false;
+                const checkInStr = checkIn.toISOString().split('T')[0];
+                const checkOutStr = checkOut.toISOString().split('T')[0];
+                return normalizedRanges.some(range => 
+                    checkInStr <= range[1] && checkOutStr >= range[0]
+                );
             }
 
-            // Highlight unavailable dates in the calendar
-            function highlightDates() {
-                document.querySelectorAll('.flatpickr-day').forEach(day => {
+            // Set minimum date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+            // Initialize Flatpickr for check-in
+            const checkInPicker = flatpickr("#check_in", {
+                dateFormat: "Y-m-d",
+                minDate: tomorrowStr > availableFrom.toISOString().split('T')[0] ? tomorrowStr : availableFrom,
+                maxDate: availableTo,
+                disable: [
+                    function(date) {
+                        return date < availableFrom || date > availableTo || isDateNotAvailable(date);
+                    }
+                ],
+                onChange: function(selectedDates) {
+                    checkInDate = selectedDates[0];
+                    if (checkInDate) {
+                        checkOutPicker.set('minDate', checkInDate);
+                    }
+                    validateDates();
+                },
+                onReady: function() {
+                    highlightUnavailableDates(this);
+                },
+                onMonthChange: function() {
+                    highlightUnavailableDates(this);
+                }
+            });
+
+            // Initialize Flatpickr for check-out
+            const checkOutPicker = flatpickr("#check_out", {
+                dateFormat: "Y-m-d",
+                minDate: availableFrom,
+                maxDate: availableTo,
+                disable: [
+                    function(date) {
+                        // Include check-in date dependency in disable logic
+                        const minCheckOut = checkInDate || availableFrom;
+                        return date < minCheckOut || date > availableTo || isDateNotAvailable(date);
+                    }
+                ],
+                onChange: function(selectedDates) {
+                    checkOutDate = selectedDates[0];
+                    validateDates();
+                },
+                onReady: function() {
+                    highlightUnavailableDates(this);
+                },
+                onMonthChange: function() {
+                    highlightUnavailableDates(this);
+                }
+            });
+
+            // Highlight unavailable dates visually
+            function highlightUnavailableDates(picker) {
+                const days = picker.element.closest('.flatpickr-calendar').querySelectorAll('.flatpickr-day');
+                days.forEach(day => {
                     const dateStr = day.getAttribute('aria-label');
                     if (dateStr) {
                         const currentDate = new Date(dateStr);
-                        if (isDateNotAvailable(dateStr) || currentDate < availableFrom || currentDate > availableTo) {
+                        const isCheckInPicker = picker.element.id === 'check_in';
+                        const minDate = isCheckInPicker 
+                            ? (tomorrowStr > availableFrom.toISOString().split('T')[0] ? tomorrow : availableFrom)
+                            : (checkInDate || availableFrom);
+
+                        if (
+                            currentDate < minDate || 
+                            currentDate > availableTo || 
+                            isDateNotAvailable(currentDate)
+                        ) {
                             day.classList.add('unavailable-date');
                             day.classList.remove('available-date');
                         } else {
@@ -303,71 +364,16 @@
                 });
             }
 
-            // Set tomorrow for minimum date comparison
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowStr = tomorrow.toISOString().split('T')[0];
-
-            // Initialize check-in date picker
-            const checkInPicker = flatpickr("#check_in", {
-                dateFormat: "Y-m-d",
-                minDate: availableFrom,
-                maxDate: availableTo,
-                disable: [
-                    function(date) {
-                        const dateStr = date.toISOString().split('T')[0];
-                        return dateStr < tomorrowStr || isDateNotAvailable(dateStr);
-                    }
-                ],
-                onChange: function(selectedDates) {
-                    checkInDate = selectedDates[0];
-                    if (checkInDate) {
-                        const nextDay = new Date(checkInDate);
-                        nextDay.setDate(nextDay.getDate() + 1);
-                        checkOutPicker.set('minDate', nextDay);
-                    }
-                    highlightDates();
-                    validateDates();
-                },
-                onReady: highlightDates,
-                onMonthChange: highlightDates
-            });
-
-            // Initialize check-out date picker
-            const checkOutPicker = flatpickr("#check_out", {
-                dateFormat: "Y-m-d",
-                minDate: new Date(availableFrom.getTime() + 86400000), // 1 day after availableFrom
-                maxDate: availableTo,
-                disable: [
-                    function(date) {
-                        const dateStr = date.toISOString().split('T')[0];
-                        return dateStr < tomorrowStr || isDateNotAvailable(dateStr);
-                    }
-                ],
-                onChange: function(selectedDates) {
-                    checkOutDate = selectedDates[0];
-                    highlightDates();
-                    validateDates();
-                },
-                onReady: highlightDates,
-                onMonthChange: highlightDates
-            });
-
-            // Validate selected dates and update price breakdown
+            // Validate dates and update price breakdown
             function validateDates() {
                 if (checkInDate && checkOutDate) {
                     const diffTime = checkOutDate - checkInDate;
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-                    if (diffDays > 0 && !hasOverlap(checkInDate, checkOutDate)) {
-                        // Calculate total (no service fee)
+                    if (diffDays >= 1 && !hasOverlap(checkInDate, checkOutDate)) {
                         const total = diffDays * pricePerNight;
-
-                        // Update price breakdown
                         nightCountSpan.textContent = diffDays;
                         totalAmountSpan.textContent = `${total} DH`;
-
-                        // Show price breakdown and enable button
                         priceBreakdownDiv.classList.remove('hidden');
                         dateErrorDiv.classList.add('hidden');
                         reserveButton.disabled = false;

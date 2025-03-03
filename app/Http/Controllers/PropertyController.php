@@ -7,6 +7,7 @@ use App\Http\Requests\UpdatePropertyRequest;
 use App\Models\City;
 use App\Models\Property;
 use App\Models\Type;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -36,7 +37,19 @@ class PropertyController extends Controller
 
     public function show(Property $property)
     {
-        return view("properties.show", compact("property"));
+        $notAvailableRanges = $property->reservations->map(function($reservation){
+            return [
+                Carbon::parse($reservation->from)->addDay(),
+                $reservation->to
+            ];
+        });
+
+        $notAvailableRanges = [[
+            "2025-03-28 19:44:55.0 UTC (+00:00)",
+            "2025-03-29 19:44:55.0 UTC (+00:00)",
+        ]];
+        
+        return view("properties.show", compact("property", "notAvailableRanges"));
     }
 
     public function create()

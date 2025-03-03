@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
-            $table->float("price");
+            $table->float("total_price");
             $table->date("from_date");
             $table->date("to_date");
             $table->foreignId("user_id")->constrained("users")->nullable();
+            $table->foreignId("property_id")->constrained("properties")->nullable();
             $table->timestamps();
         });
     }
