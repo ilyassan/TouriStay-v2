@@ -44,6 +44,61 @@
                                         class="{{ Request::routeIs('my-properties.index', 'properties.create', 'properties.edit') ? 'text-[#FF5A5F]' : 'text-gray-700 hover:text-[#FF5A5F]' }} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                                         My Properties
                                     </a>
+                                    <!-- Notification Button for Proprietors -->
+                                    <div class="relative">
+                                        <button id="notification-toggle" class="text-gray-700 hover:text-[#FF5A5F] px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                                            </svg>
+                                            <span class="absolute top-1 right-2 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-[#FF5A5F] rounded-full">3</span>
+                                        </button>
+                                        <!-- Notification Dropdown -->
+                                        <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-xl z-50">
+                                            <div class="p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+                                                <h4 class="text-sm font-semibold text-gray-900">Notifications (3)</h4>
+                                            </div>
+                                            <div class="max-h-64 overflow-y-auto">
+                                                <ul class="divide-y divide-gray-100">
+                                                    <li class="p-4 hover:bg-gray-50 transition duration-150 ease-in-out">
+                                                        <div class="flex items-start space-x-3">
+                                                            <svg class="w-5 h-5 text-[#FF5A5F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                            </svg>
+                                                            <div>
+                                                                <p class="text-sm text-gray-900"><span class="font-medium">Property Reserved:</span> "Luxury Villa in Marrakech"</p>
+                                                                <p class="text-xs text-gray-600">By John Doe for Jun 15-20, 2030</p>
+                                                                <p class="text-xs text-gray-500">2 hours ago</p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="p-4 hover:bg-gray-50 transition duration-150 ease-in-out">
+                                                        <div class="flex items-start space-x-3">
+                                                            <svg class="w-5 h-5 text-[#FF5A5F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                            </svg>
+                                                            <div>
+                                                                <p class="text-sm text-gray-900"><span class="font-medium">Property Reserved:</span> "Cozy Apartment in Lisbon"</p>
+                                                                <p class="text-xs text-gray-600">By Jane Smith for Jun 22-25, 2030</p>
+                                                                <p class="text-xs text-gray-500">1 day ago</p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="p-4 hover:bg-gray-50 transition duration-150 ease-in-out">
+                                                        <div class="flex items-start space-x-3">
+                                                            <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                            </svg>
+                                                            <div>
+                                                                <p class="text-sm text-gray-900"><span class="font-medium">Cancellation:</span> "Beach House in Barcelona"</p>
+                                                                <p class="text-xs text-gray-600">By Alex Brown for Jun 10-12, 2030</p>
+                                                                <p class="text-xs text-gray-500">3 days ago</p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
                                 @endif
 
                                 <form action="{{ route('logout') }}" method="POST" class="inline">
@@ -194,7 +249,7 @@
             </script>
         @endif
 
-        @if (isset($warning) && !empty($success))
+        @if (isset($warning) && !empty($warning))
             <script>
                 let message = "{{ $warning }}";
                 Swal.fire({
@@ -205,5 +260,26 @@
                 });
             </script>
         @endif
+
+        <!-- Notification Toggle Script -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const toggleButton = document.getElementById('notification-toggle');
+                const dropdown = document.getElementById('notification-dropdown');
+
+                // Toggle dropdown on button click
+                toggleButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    dropdown.classList.toggle('hidden');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function (event) {
+                    if (!toggleButton.contains(event.target) && !dropdown.contains(event.target)) {
+                        dropdown.classList.add('hidden');
+                    }
+                });
+            });
+        </script>
     </body>
 </html>
