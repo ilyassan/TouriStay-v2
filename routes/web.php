@@ -7,6 +7,7 @@ use App\Http\Controllers\OwnerPropertyController;
 use App\Http\Controllers\PerformanceTestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\ReservationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name("home")->middleware("proprietor_or_tourist");
@@ -29,6 +30,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [FavoriteController::class, 'index'])->name("favorites.index");
         Route::post('/store', [FavoriteController::class, 'store'])->name("favorites.store");
     });
+    Route::middleware("tourist")->get('/my-reservations', [ReservationController::class, 'my'])->name("reservations.my");
 
     Route::middleware("tourist")->prefix('reservations')->group(function () {
         Route::post('/store', function(){})->name("reservations.store");
