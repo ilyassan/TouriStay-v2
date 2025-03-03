@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             CitySeeder::class,
             PropertySeeder::class,
             FavoriteSeeder::class,
+            ReservationSeeder::class,
         ]);
     }
 }
