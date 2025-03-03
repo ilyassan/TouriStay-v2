@@ -20,6 +20,6 @@ class ProprietorOrTourist
             return $next($request);
         }
         
-        return redirect("/");
+        return redirect()->route("dashboard");
     }
 }
