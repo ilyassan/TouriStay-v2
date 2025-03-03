@@ -31,7 +31,12 @@ class PropertyController extends Controller
                                 ->paginate($itemsToShow)
                                 ->appends(request()->query());
 
-        return view(Auth::user()->isProprietor() ? "properties.index" : "properties.admin", compact('properties'));
+        return view(Auth::check() && !Auth::user()->isAdmin() ? "properties.index" : "properties.admin", compact('properties'));
+    }
+
+    public function show(Property $property)
+    {
+        return view("properties.show", compact("property"));
     }
 
     public function create()
