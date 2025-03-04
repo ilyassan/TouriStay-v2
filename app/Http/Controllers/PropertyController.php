@@ -39,16 +39,11 @@ class PropertyController extends Controller
     {
         $notAvailableRanges = $property->reservations->map(function($reservation){
             return [
-                Carbon::parse($reservation->from)->addDay(),
-                $reservation->to
+                Carbon::parse($reservation->getFromDate()),
+                Carbon::parse($reservation->getToDate()),
             ];
         });
 
-        $notAvailableRanges = [[
-            "2025-03-28 19:44:55.0 UTC (+00:00)",
-            "2025-03-29 19:44:55.0 UTC (+00:00)",
-        ]];
-        
         return view("properties.show", compact("property", "notAvailableRanges"));
     }
 
