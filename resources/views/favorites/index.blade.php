@@ -58,7 +58,7 @@
                             <p class="text-gray-600 mb-4">{{ Str::limit($property->getDescription(), 97) }}</p>
                             <div class="flex items-center justify-between">
                                 <span class="text-lg font-bold text-gray-900">{{ $property->getPrice() }} DH <span class="text-sm font-normal text-gray-600">/ night</span></span>
-                                <button class="bg-[#FF5A5F] hover:bg-[#E94E53] text-white px-4 py-2 rounded-lg font-medium transition duration-300 ease-in-out">Book Now</button>
+                                <a href="{{ route('properties.show', $property->getPrimaryKey()) }}" class="bg-[#FF5A5F] hover:bg-[#E94E53] text-white px-4 py-2 rounded-lg font-medium transition duration-300 ease-in-out">Book Now</a>
                             </div>
                         </div>
                     </div>

@@ -34,10 +34,14 @@
                                     </a>
                                 @endif
                                 @if (auth()->user()->isTourist())
+                                    <a href="{{ route('reservations.my') }}"
+                                        class="{{ Request::routeIs('reservations.my') ? 'text-[#FF5A5F]' : 'text-gray-700 hover:text-[#FF5A5F]' }} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                                        Reservations
+                                    </a>   
                                     <a href="{{ route('favorites.index') }}"
                                         class="{{ Request::routeIs('favorites.index') ? 'text-[#FF5A5F]' : 'text-gray-700 hover:text-[#FF5A5F]' }} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                                         Favorites
-                                    </a>    
+                                    </a>     
                                 @endif
                                 @if (auth()->user()->isProprietor())
                                     <a href="{{ route('my-properties.index') }}"
