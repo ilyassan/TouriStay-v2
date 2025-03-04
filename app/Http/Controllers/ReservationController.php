@@ -50,6 +50,15 @@ class ReservationController extends Controller
         $data["total_price"] = $property->getPrice() * $nights;
         $data["user_id"] = Auth::id();
 
+        
+        $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET"));
+
+        $stripe->charges->create([
+            'amount' => $data["total_price"] * 10,
+            'currency' => 'usd',
+            'source' => 'tok_visa',
+        ]);
+
         Reservation::create($data);
 
         return back()->with("success", "Reservation created successfully.");

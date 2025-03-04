@@ -144,14 +144,27 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="relative">
+                                    <label for="card-element" class="block text-sm font-medium text-gray-700 mb-1.5">Card</label>
+                                    <div class="relative group">
+                                        <div type="text" id="card-element" name="card" 
+                                                class="w-full pl-4 pr-4 py-3 border border-gray-200 rounded-lg bg-white shadow-sm 
+                                                text-gray-900 text-sm focus:ring-2 focus:ring-[#FF5A5F] focus:border-[#FF5A5F] 
+                                                transition-all duration-200 hover:border-gray-300">
+                                        </div>
+    
+                                    </div>
+                                </div>
                             </div>
+                        </div>
 
                             <!-- Price Breakdown (No Service Fee) -->
                             <div id="priceBreakdown" class="mt-4 pt-4 border-t border-gray-200 bg-gray-50 p-4 rounded-lg space-y-3 hidden">
                                 <div class="space-y-2">
                                     <div class="flex justify-between text-sm text-gray-600">
                                         <span>Number of nights</span>
-                                        <span id="nightCount">0</span>
+                                        <span id="nightCount" onclick="createToken()">0</span>
                                     </div>
                                     <div class="flex justify-between text-sm text-gray-600">
                                         <span>Price per night</span>
@@ -169,12 +182,14 @@
                                 Please select valid dates within the available range with no overlapping bookings.
                             </div>
 
+                            <input type="hidden" name="stripe-token" id="stripe-token" value="">
+
                             <!-- Submit Button -->
                             <button type="submit" 
                                     class="w-full bg-[#FF5A5F] hover:bg-[#E94E53] text-white px-4 py-3 rounded-lg 
                                     font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg 
                                     disabled:bg-gray-400 disabled:cursor-not-allowed disabled:shadow-none" 
-                                    id="reserveButton" disabled>
+                                    id="reserveButton" onclick="createToken()" disabled>
                                 Reserve Now
                             </button>
                         </form>
@@ -246,7 +261,24 @@
             object-fit: cover;
         }
     </style>
+    
+    <script src="https://js.stripe.com/v3/"></script>
     <script>
+        var stripe = new Stripe('{{ env("STRIPE_KEY") }}');
+
+        var elements = stripe.elements();
+        var cardElement = elements.create("card");
+        cardElement.mount("#card-element");
+
+        function createToken(){
+            stripe.createToken(cardElement).then(function(result){
+                console.log(result);
+                if(result.token){
+                    document.getElementById("stripe-token").value = result.token.id;
+                }
+            })
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const pricePerNight = {{ $property->getPrice() }};
             const availableFrom = new Date("{{ $property->available_from }}");
