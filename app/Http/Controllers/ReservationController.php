@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreReservationRequest;
 use App\Models\Property;
 use App\Models\Reservation;
+use App\Notifications\PropertyReserved;
 use App\Notifications\ReservationInvoice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ class ReservationController extends Controller
     {
         $data = $request->validated();
         
-        $property = Property::find($data['property_id']);
+        $property = Property::with("owner", "type", "city")->find($data['property_id']);
 
         if ($property->getAvailableFromDate() > $data['from_date'] || $property->getAvailableToDate() < $data['to_date']) {
             return back()->with("error", "The property is not available for the selected dates.");
@@ -63,6 +64,7 @@ class ReservationController extends Controller
         $reservation = Reservation::create($data);
 
         $request->user()->notify(new ReservationInvoice($reservation));
+        $property->owner->notify(new PropertyReserved('Property Reserved: "'. $property->type->getName() .' in '. $property->city->getName() .'"'));
 
         return back()->with("success", "Reservation created successfully.");
     }

@@ -8,7 +8,7 @@ use App\Http\Controllers\PerformanceTestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\ReservationController;
-use App\Models\Reservation;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name("home")->middleware("proprietor_or_tourist");
@@ -48,6 +48,10 @@ Route::middleware('auth')->group(function () {
     // Owner-specific Routes
     Route::middleware('proprietor')->group(function () {
         Route::get('/my-properties', OwnerPropertyController::class)->name("my-properties.index");
+        Route::post('/notification/read/{id}', function($id){
+            Auth::user()->unreadNotifications->where('id', $id)->markAsRead();
+            return back();
+        })->name("notification.mark");
     });
 
     Route::middleware("proprietor_or_admin")->delete('/destroy/{property}', [PropertyController::class, 'destroy'])->name("properties.destroy");
