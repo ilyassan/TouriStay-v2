@@ -74,7 +74,7 @@
                                 @if (auth()->id() == $property->getOwnerId())
                                     <a href="{{ route('properties.edit', $property->getPrimaryKey()) }}" class="bg-[#FF5A5F] hover:bg-[#E94E53] text-white px-4 py-2 rounded-lg font-medium transition duration-300 ease-in-out">View</a>
                                 @else
-                                    <button class="bg-[#FF5A5F] hover:bg-[#E94E53] text-white px-4 py-2 rounded-lg font-medium transition duration-300 ease-in-out">Book Now</button>
+                                    <a href="{{ route('properties.show', $property->getPrimaryKey()) }}" class="bg-[#FF5A5F] hover:bg-[#E94E53] text-white px-4 py-2 rounded-lg font-medium transition duration-300 ease-in-out">Book Now</a>
                                 @endif
                             </div>
                         </div>

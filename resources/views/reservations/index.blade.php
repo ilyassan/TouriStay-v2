@@ -22,15 +22,8 @@
             <!-- Filters and Sort -->
             <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
                 <h2 class="text-2xl font-semibold text-gray-900">
-                    My Reservations <span class="text-sm font-normal text-gray-500">(3 bookings)</span>
+                    My Reservations <span class="text-sm font-normal text-gray-500">({{ count($reservations) }} bookings)</span>
                 </h2>
-                <div class="flex space-x-4">
-                    <select class="p-2 border border-gray-300 rounded-lg focus:ring-[#FF5A5F] focus:border-[#FF5A5F]">
-                        <option value="">Sort by: Date</option>
-                        <option value="price">Sort by: Price</option>
-                        <option value="status">Sort by: Status</option>
-                    </select>
-                </div>
             </div>
             
             <!-- Empty State (Hidden since we have static data) -->
@@ -49,98 +42,35 @@
 
             <!-- Reservations Grid with Static Data -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Reservation 1 -->
+                @foreach ($reservations as $reservation)
                 <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300 border border-gray-200">
                     <img src="https://placehold.co/400x224" alt="Luxury Villa in Marrakech" class="w-full h-56 object-cover">
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <h3 class="text-xl font-semibold text-gray-900">Luxury Villa in Marrakech</h3>
-                                <p class="text-gray-600">Marrakech, Morocco</p>
+                                <h3 class="text-xl font-semibold text-gray-900">{{ $reservation->property->type->getName() }} in {{ $reservation->property->city->getName() }}</h3>
+                                <p class="text-gray-600">{{ $reservation->property->city->getName() }}, Morocco</p>
                             </div>
                             <span class="text-sm font-medium px-2 py-1 rounded-full bg-green-100 text-green-800">
                                 Confirmed
                             </span>
                         </div>
                         <p class="text-gray-600 mb-4">
-                            <span class="font-medium">Dates:</span> Jun 15, 2030 - Jun 20, 2030
+                            <span class="font-medium">Dates:</span>{{ \Carbon\Carbon::parse($reservation->getFromDate())->format('M j, Y') }} - {{ \Carbon\Carbon::parse($reservation->getToDate())->format('M j, Y') }}
                         </p>
                         <p class="text-gray-600 mb-4">
-                            <span class="font-medium">Guests:</span> 4
+                            <span class="font-medium">Bedrooms:</span> {{ $reservation->property->getBedrooms() }}
                         </p>
                         <div class="flex items-center justify-between">
                             <div class="flex space-x-2">
-                                <button class="bg-[#FF5A5F] hover:bg-[#E94E53] text-white px-4 py-2 rounded-lg font-medium transition duration-300 ease-in-out">
-                                    Cancel
-                                </button>
-                                <a href="#" class="bg-white border border-gray-300 hover:border-[#FF5A5F] text-gray-900 px-4 py-2 rounded-lg font-medium transition duration-300 ease-in-out">
+                                <a href="{{ route('properties.show', $reservation->property->getPrimaryKey() ) }}" class="bg-[#FF5A5F] hover:bg-[#E94E53] text-white px-4 py-2 rounded-lg font-medium transition duration-300 ease-in-out">
                                     View Details
                                 </a>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Reservation 2 -->
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300 border border-gray-200">
-                    <img src="https://placehold.co/400x224" alt="Cozy Apartment in Lisbon" class="w-full h-56 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <h3 class="text-xl font-semibold text-gray-900">Cozy Apartment in Lisbon</h3>
-                                <p class="text-gray-600">Lisbon, Portugal</p>
-                            </div>
-                            <span class="text-sm font-medium px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">
-                                Pending
-                            </span>
-                        </div>
-                        <p class="text-gray-600 mb-4">
-                            <span class="font-medium">Dates:</span> Jun 22, 2030 - Jun 25, 2030
-                        </p>
-                        <p class="text-gray-600 mb-4">
-                            <span class="font-medium">Guests:</span> 2
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <div class="flex space-x-2">
-                                <button class="bg-[#FF5A5F] hover:bg-[#E94E53] text-white px-4 py-2 rounded-lg font-medium transition duration-300 ease-in-out">
-                                    Cancel
-                                </button>
-                                <a href="#" class="bg-white border border-gray-300 hover:border-[#FF5A5F] text-gray-900 px-4 py-2 rounded-lg font-medium transition duration-300 ease-in-out">
-                                    View Details
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reservation 3 -->
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300 border border-gray-200">
-                    <img src="https://placehold.co/400x224" alt="Beach House in Barcelona" class="w-full h-56 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <h3 class="text-xl font-semibold text-gray-900">Beach House in Barcelona</h3>
-                                <p class="text-gray-600">Barcelona, Spain</p>
-                            </div>
-                            <span class="text-sm font-medium px-2 py-1 rounded-full bg-red-100 text-red-800">
-                                Canceled
-                            </span>
-                        </div>
-                        <p class="text-gray-600 mb-4">
-                            <span class="font-medium">Dates:</span> Jun 10, 2030 - Jun 12, 2030
-                        </p>
-                        <p class="text-gray-600 mb-4">
-                            <span class="font-medium">Guests:</span> 6
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <div class="flex space-x-2">
-                                <a href="#" class="bg-white border border-gray-300 hover:border-[#FF5A5F] text-gray-900 px-4 py-2 rounded-lg font-medium transition duration-300 ease-in-out">
-                                    View Details
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>

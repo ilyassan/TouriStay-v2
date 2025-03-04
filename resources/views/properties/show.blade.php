@@ -1,6 +1,10 @@
 <x-app-layout>
     <x-slot:title> Property Details </x-slot>
 
+    @if ($errors->any())
+        <x-slot:error>{{ $errors->first() }}</x-slot> 
+    @endif
+
     <section class="py-6 bg-gray-50 min-h-screen">
         <div class="container mx-auto px-4 md:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -108,7 +112,7 @@
                                 <div class="relative">
                                     <label for="check_in" class="block text-sm font-medium text-gray-700 mb-1.5">Check-In Date</label>
                                     <div class="relative group">
-                                        <input type="text" id="check_in" name="check_in" 
+                                        <input type="text" id="check_in" name="from_date" 
                                                class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg bg-white shadow-sm 
                                                text-gray-900 text-sm focus:ring-2 focus:ring-[#FF5A5F] focus:border-[#FF5A5F] 
                                                transition-all duration-200 hover:border-gray-300" 
@@ -126,7 +130,7 @@
                                 <div class="relative">
                                     <label for="check_out" class="block text-sm font-medium text-gray-700 mb-1.5">Check-Out Date</label>
                                     <div class="relative group">
-                                        <input type="text" id="check_out" name="check_out" 
+                                        <input type="text" id="check_out" name="to_date" 
                                                class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg bg-white shadow-sm 
                                                text-gray-900 text-sm focus:ring-2 focus:ring-[#FF5A5F] focus:border-[#FF5A5F] 
                                                transition-all duration-200 hover:border-gray-300" 

@@ -8,6 +8,7 @@ use App\Http\Controllers\PerformanceTestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\ReservationController;
+use App\Models\Reservation;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name("home")->middleware("proprietor_or_tourist");
@@ -33,7 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware("tourist")->get('/my-reservations', [ReservationController::class, 'my'])->name("reservations.my");
 
     Route::middleware("tourist")->prefix('reservations')->group(function () {
-        Route::post('/store', function(){})->name("reservations.store");
+        Route::post('/store', [ReservationController::class, 'store'])->name("reservations.store");
     });
 
     // Property Management (General)
