@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreReservationRequest;
 use App\Models\Property;
 use App\Models\Reservation;
+use App\Notifications\ReservationInvoice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -59,7 +60,9 @@ class ReservationController extends Controller
             'source' => 'tok_visa',
         ]);
 
-        Reservation::create($data);
+        $reservation = Reservation::create($data);
+
+        $request->user()->notify(new ReservationInvoice($reservation));
 
         return back()->with("success", "Reservation created successfully.");
     }
