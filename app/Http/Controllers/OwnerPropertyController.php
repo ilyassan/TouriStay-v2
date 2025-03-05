@@ -23,10 +23,12 @@ class OwnerPropertyController extends Controller
             ->count();
 
         $reservations = $properties->flatMap(function ($property) {
-            $reservation = $property->reservations;
-            $reservation->property = $property;
-            return $reservation;
+            return $property->reservations->map(function ($reservation) use ($property) {
+                $reservation->property = $property;
+                return $reservation;
+            });
         });
+
 
         return view('my-properties.index', compact('properties', 'propertiesCount', 'activePropertiesCount', 'reservations'));
     }

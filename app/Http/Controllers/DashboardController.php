@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Property;
 use App\Models\Type;
 use App\Models\User;
+use App\Models\Reservation;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -20,11 +20,16 @@ class DashboardController extends Controller
         $thisMonthTouristsCount = User::tourists()->whereMonth('created_at', now()->month)->count();
         $lastMonthTouristsCount = User::tourists()->whereMonth('created_at', now()->subMonth()->month)->count();
         $touristsRatio = $lastMonthTouristsCount == 0 ? 100 : ($thisMonthTouristsCount / $lastMonthTouristsCount * 100);
+        
+        $thisMonthActiveProperties = Reservation::where('from_date', '<=', now())->where('to_date', '>=', now())->whereMonth('created_at', now()->month)->count();
+        $lastMonthActiveProperties = Reservation::where('from_date', '<=', now())->where('to_date', '>=', now())->whereMonth('created_at', now()->subMonth()->month)->count();
+        $activePropertiesRatio = $lastMonthActiveProperties == 0 ? 100 : ($thisMonthActiveProperties / $lastMonthActiveProperties * 100);
 
+        $totalRevenue = Reservation::sum('total_price');
 
         $lastSixMonths = collect(range(0, 5))->mapWithKeys(function ($monthsAgo) {
             $monthDate = now()->subMonths($monthsAgo)->startOfMonth();
-            return [$monthDate->format('M') => 0]; // Initialize all months with count 0
+            return [$monthDate->format('M') => 0];
         });
 
         $touristsPerMonth = User::tourists()
@@ -45,7 +50,6 @@ class DashboardController extends Controller
                 return [Carbon::createFromFormat('m', $item->month)->format('M') => $item->count];
             });
         
-        // Merge the actual data with the initialized months
         $lastSixMonthTourists = $lastSixMonths->merge($touristsPerMonth);
         $lastSixMonthProprietors = $lastSixMonths->merge($proprietorsPerMonth);
 
@@ -74,7 +78,6 @@ class DashboardController extends Controller
             ];
         });
 
-        // order by native php using the sort function
         $latestActivities = collect($latestActivities)->sort(function ($activity1, $activity2) {
             return $activity1['created_at'] <=> $activity2['created_at'];
         });
@@ -84,6 +87,9 @@ class DashboardController extends Controller
             'propertiesRatio',
             'thisMonthTouristsCount',
             'touristsRatio',
+            'thisMonthActiveProperties',
+            'activePropertiesRatio',
+            'totalRevenue',
             'lastSixMonthTourists',
             'lastSixMonthProprietors',
             'types',

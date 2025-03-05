@@ -145,6 +145,7 @@
                                     </div>
                                 </div>
 
+                                @if (auth()->user()->isTourist())
                                 <div class="relative">
                                     <label for="card-element" class="block text-sm font-medium text-gray-700 mb-1.5">Card</label>
                                     <div class="relative group">
@@ -155,7 +156,9 @@
                                         </div>
     
                                     </div>
+                                    <input type="hidden" name="stripe-token" id="stripe-token" value="">
                                 </div>
+                                @endif
                             </div>
                         </div>
 
@@ -182,16 +185,16 @@
                                 Please select valid dates within the available range with no overlapping bookings.
                             </div>
 
-                            <input type="hidden" name="stripe-token" id="stripe-token" value="">
-
-                            <!-- Submit Button -->
-                            <button type="submit" 
+                            @if (auth()->user()->isTourist())
+                                <!-- Submit Button -->
+                                <button type="submit" 
                                     class="w-full bg-[#FF5A5F] hover:bg-[#E94E53] text-white px-4 py-3 rounded-lg 
                                     font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg 
                                     disabled:bg-gray-400 disabled:cursor-not-allowed disabled:shadow-none" 
                                     id="reserveButton" onclick="createToken()" disabled>
                                 Reserve Now
                             </button>
+                            @endif
                         </form>
 
                         <!-- Cancellation Policy -->
@@ -263,22 +266,26 @@
     </style>
     
     <script src="https://js.stripe.com/v3/"></script>
+    @if (auth()->user()->isTourist())
+        <script>
+            var stripe = new Stripe('{{ env("STRIPE_KEY") }}');
+
+            var elements = stripe.elements();
+            var cardElement = elements.create("card");
+            cardElement.mount("#card-element");
+
+            function createToken(){
+                stripe.createToken(cardElement).then(function(result){
+                    console.log(result);
+                    if(result.token){
+                        document.getElementById("stripe-token").value = result.token.id;
+                    }
+                })
+            }
+        </script>
+    @endif
+    
     <script>
-        var stripe = new Stripe('{{ env("STRIPE_KEY") }}');
-
-        var elements = stripe.elements();
-        var cardElement = elements.create("card");
-        cardElement.mount("#card-element");
-
-        function createToken(){
-            stripe.createToken(cardElement).then(function(result){
-                console.log(result);
-                if(result.token){
-                    document.getElementById("stripe-token").value = result.token.id;
-                }
-            })
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
             const pricePerNight = {{ $property->getPrice() }};
             const availableFrom = new Date("{{ $property->available_from }}");

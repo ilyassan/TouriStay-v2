@@ -17,7 +17,7 @@ class ReservationSeeder extends Seeder
     public function run(): void
     {
         $properties = Property::all();
-        $users = User::pluck("id")->toArray();
+        $users = User::tourists()->pluck("id")->toArray();
 
         $properties->each(function($property) use ($users){
             $from = Carbon::parse($property->available_from);
@@ -28,7 +28,7 @@ class ReservationSeeder extends Seeder
             $fromDate = $from->addDays($addedDays);
             $toDate = $fromDate->copy()->addDays(rand(0, $availabilityDays - $addedDays));
 
-            $reservation = Reservation::create([
+            Reservation::create([
                 "user_id" => Arr::random($users),
                 "property_id" => $property->id,
                 "from_date" => $fromDate,

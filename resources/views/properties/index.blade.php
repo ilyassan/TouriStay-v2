@@ -51,6 +51,7 @@
                         $isFavorite = count($property->favorites) > 0;
                     @endphp
                     <div class="bg-white relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300 border border-gray-200">
+                        @if (auth()->user()->isTourist())
                         <form method="POST" action="{{ route('favorites.store') }}" class="absolute top-4 right-4 z-10">
                             @csrf
                             <input type="hidden" name="property_id" value="{{ $property->getPrimaryKey() }}">
@@ -60,6 +61,7 @@
                                 </svg>
                             </button>
                         </form>
+                        @endif
                         <img src="{{ $property->getImage() }}" alt="Luxury Apartment in Marrakech" class="w-full h-56 object-cover">
                         <div class="p-6">
                             <div class="flex justify-between items-start mb-2">
@@ -73,7 +75,7 @@
                                 <span class="text-lg font-bold text-gray-900"> {{ $property->getPrice() }} DH <span class="text-sm font-normal text-gray-600">/ night</span></span>
                                 @if (auth()->id() == $property->getOwnerId())
                                     <a href="{{ route('properties.edit', $property->getPrimaryKey()) }}" class="bg-[#FF5A5F] hover:bg-[#E94E53] text-white px-4 py-2 rounded-lg font-medium transition duration-300 ease-in-out">View</a>
-                                @else
+                                @elseif(auth()->user()->isTourist())
                                     <a href="{{ route('properties.show', $property->getPrimaryKey()) }}" class="bg-[#FF5A5F] hover:bg-[#E94E53] text-white px-4 py-2 rounded-lg font-medium transition duration-300 ease-in-out">Book Now</a>
                                 @endif
                             </div>

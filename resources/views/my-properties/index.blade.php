@@ -1,6 +1,9 @@
 <x-app-layout>
     <x-slot:title> My Properties - World Cup 2030 </x-slot>
 
+    @php
+        $today = \Carbon\Carbon::today();
+    @endphp
     <!-- Header Section -->
     <section class="relative py-16 bg-gray-50">
         <div class="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
@@ -55,7 +58,7 @@
                     </div>
                 </div>
                 
-                <!-- Pending Bookings Card -->
+                <!-- Upcoming Bookings Card -->
                 <div class="bg-white rounded-xl overflow-hidden shadow-md border border-gray-200 p-6">
                     <div class="flex items-center">
                         <div class="p-3 rounded-full bg-yellow-100 mr-4">
@@ -64,8 +67,13 @@
                             </svg>
                         </div>
                         <div>
-                            <p class="text-gray-500 text-sm">Pending Bookings</p>
-                            <p class="text-2xl font-bold">7</p>
+                            <p class="text-gray-500 text-sm">Upcoming Bookings</p>
+                            @php
+                                $upcomingBookings = $reservations->filter(function ($reservation) use ($today) {
+                                    return $today->lessThan(\Carbon\Carbon::parse($reservation->getFromDate()));
+                                })->count();
+                            @endphp
+                            <p class="text-2xl font-bold">{{ $upcomingBookings }}</p>
                         </div>
                     </div>
                 </div>
@@ -81,7 +89,12 @@
                         </div>
                         <div>
                             <p class="text-gray-500 text-sm">Total Earnings</p>
-                            <p class="text-2xl font-bold">8,420 DH</p>
+                            @php
+                                $totalEarnings = $reservations->sum(function ($reservation) {
+                                    return $reservation->getTotalPrice();
+                                });
+                            @endphp
+                            <p class="text-2xl font-bold">{{ number_format($totalEarnings, 0) }} DH</p>
                         </div>
                     </div>
                 </div>
@@ -95,15 +108,26 @@
             <!-- Property Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
                 @foreach ($properties as $property)
+                    @php
+                        $isActive = false;
+                        foreach ($reservations as $reservation) {
+                            if ($reservation->property_id === $property->getPrimaryKey() &&
+                                $today->gte(\Carbon\Carbon::parse($reservation->getFromDate())) &&
+                                $today->lte(\Carbon\Carbon::parse($reservation->getToDate()))) {
+                                $isActive = true;
+                                break;
+                            }
+                        }
+                    @endphp
                     <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300 border border-gray-200">
                         <div class="relative">
-                            <span class="absolute top-3 left-3 {{ $property->isActive() ? 'bg-green-500' : 'bg-red-500' }} text-white text-xs font-bold px-3 py-1 rounded-full z-10">{{ $property->isActive() ? "Active" : "Inactive" }}</span>
+                            <span class="absolute top-3 left-3 {{ $isActive ? 'bg-green-500' : 'bg-red-500' }} text-white text-xs font-bold px-3 py-1 rounded-full z-10">{{ $isActive ? "Active" : "Inactive" }}</span>
                             <img src="{{ $property->getImage() }}" alt="Luxury Apartment in Marrakech" class="w-full h-48 object-cover">
                         </div>
                         <div class="p-6">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <h3 class="text-xl font-semibold text-gray-900">{{ $property->type->getName() }}</h3>
+                                    <h3 class="text-xl font-semibold text-gray-900">{{ $property->getTitle() }}</h3>
                                     <p class="text-gray-600">{{ $property->city->getName()}}</p>
                                 </div>
                             </div>
@@ -135,7 +159,7 @@
                             
                             <div class="border-t border-gray-200 pt-4">
                                 <div class="flex gap-2">
-                                    <a href="#" class="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 rounded text-sm font-medium text-center transition duration-300 ease-in-out">Preview</a>
+                                    <a href="{{ route('properties.show' , $property->getPrimaryKey()) }}" class="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 rounded text-sm font-medium text-center transition duration-300 ease-in-out">Preview</a>
                                     <a href="{{ route('properties.edit', $property->getPrimaryKey()) }}" class="flex-1 bg-[#FF5A5F] text-white hover:bg-[#E94E53] py-2 rounded text-sm font-medium text-center transition duration-300 ease-in-out">Edit</a>
                                 </div>
                             </div>
@@ -151,12 +175,6 @@
         <div class="container mx-auto px-4 md:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-2xl font-semibold">Recent Booking Requests</h2>
-                <a href="#" class="text-[#FF5A5F] hover:text-[#E94E53] font-medium flex items-center">
-                    View All
-                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </a>
             </div>
             
             <div class="bg-white rounded-xl shadow-md overflow-hidden">
@@ -184,7 +202,6 @@
                         @foreach ($reservations as $reservation)
                         @php
                             $tourist = $reservation->tourist;
-                            // how to get the property because its not in the reservation, it not exists dont try to access it
                             $property = $reservation->property;
                         @endphp
                             <tr>
@@ -217,7 +234,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-200 text-green-600">
-                                        Completed
+                                        {{ $today->gt($reservation->getToDate()) ? 'Completed' : ($today->gte($reservation->getFromDate()) ? 'Ongoing' : 'Upcoming') }}
                                     </span>
                                 </td>
                             </tr>
