@@ -41,14 +41,14 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <p class="text-xs font-medium text-gray-500">Active Bookings</p>
-                        <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ 120 }}</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ $thisMonthActiveProperties }}</h3>
                     </div>
                     <div class="bg-green-50 p-3 rounded-lg">
                         <i class="fas fa-calendar-check text-green-500 text-xl"></i>
                     </div>
                 </div>
-                <span class="text-sm font-medium {{ 90 > 0 ? 'text-green-600' : 'text-red-600' }} flex items-center gap-1 mt-1">
-                    <i class="fas fa-arrow-{{ 90 > 0 ? 'up' : 'down' }} text-xs"></i> {{ number_format(90, 1) }}% occupancy rate
+                <span class="text-sm font-medium {{ $activePropertiesRatio > 0 ? 'text-green-600' : 'text-red-600' }} flex items-center gap-1 mt-1">
+                    <i class="fas fa-arrow-{{ $activePropertiesRatio > 0 ? 'up' : 'down' }} text-xs"></i> {{ number_format($activePropertiesRatio, 1) }}% occupancy rate
                 </span>
             </div>
 
@@ -57,7 +57,7 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <p class="text-xs font-medium text-gray-500">30d Revenue</p>
-                        <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ number_format(96000) }} DH</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ number_format($totalRevenue/ 100, 0) }} DH</h3>
                     </div>
                     <div class="bg-purple-50 p-3 rounded-lg">
                         <i class="fas fa-wallet text-purple-500 text-xl"></i>

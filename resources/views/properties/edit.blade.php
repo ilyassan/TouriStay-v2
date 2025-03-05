@@ -183,9 +183,9 @@
 
                         <!-- Action Buttons -->
                         <div class="flex justify-between pt-6 border-t border-gray-200">
-                            <button type="button" class="bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-3 rounded-lg text-sm font-semibold transition duration-300 ease-in-out inline-block">
+                            <a href="{{ route("my-properties.index") }}" class="bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-3 rounded-lg text-sm font-semibold transition duration-300 ease-in-out inline-block">
                                 Back
-                            </button>
+                            </a>
                             <button type="submit" class="bg-[#FF5A5F] text-white hover:bg-[#E94E53] px-6 py-3 rounded-lg text-sm font-semibold transition duration-300 ease-in-out inline-block" id="goToStep2">
                                 Update Property
                             </button>

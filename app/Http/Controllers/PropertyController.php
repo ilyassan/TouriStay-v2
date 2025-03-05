@@ -85,6 +85,21 @@ class PropertyController extends Controller
     {
         $data = $request->validated();
 
+        $overlapedReservations = $property->reservations->filter(function($reservation) use ($data){
+            $reservationFromDate = Carbon::parse($reservation->getFromDate());
+            $reservationToDate = Carbon::parse($reservation->getToDate());
+
+            return
+            $data["available_from"] >= $reservationFromDate
+            ||
+            ($data["available_to"] <= $reservationToDate);
+        });
+
+        if (count($overlapedReservations) > 0) {
+            return back()->with("error", "The property availability cannot be updated because the selected dates overlap with existing reservations.");
+        }
+
+
         if (Auth::id() != $property->getOwnerId()) {
             return redirect()->route("home");
         }
